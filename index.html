@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analytics Dashboard | Emerson Insurance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN for interactive visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="top-nav">
+    <div class="nav-brand">
+      <div class="brand-icon"><i></i></div>
+      <div>
+        <h1>Emerson Insurance <span>Analytics</span></h1>
+        <p class="subtitle">Microsoft Clarity Live Insights &bull; Project ID: <code>z7fbd4m4iv</code></p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="sync-status">
+        <span class="status-dot online"></span>
+        <span id="syncTimestamp">Not synced yet</span>
+      </div>
+      <button id="refreshBtn" class="btn btn-primary" title="Fetch fresh insights from Clarity API (Limit: 10/day)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Sync Now
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Status / Notice Banner -->
+    <div id="noticeBanner" class="notice-banner hidden"></div>
+
+
+    <!-- Top KPI Metric Cards -->
+    <section class="kpi-grid">
+      <div class="card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Sessions</span>
+          <span class="kpi-icon blue">👥</span>
+        </div>
+        <div class="kpi-value" id="kpiSessions">--</div>
+        <div class="kpi-footer"><span class="badge positive" id="kpiDistinctUsers">-- users</span> over 3 days</div>
+      </div>
+
+      <div class="card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Clicks</span>
+          <span class="kpi-icon red">👆</span>
+        </div>
+        <div class="kpi-value" id="kpiClicks">--</div>
+        <div class="kpi-footer"><span class="badge neutral" id="kpiClicksPerSession">-- per session</span></div>
+      </div>
+
+      <div class="card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Top Plan Interest</span>
+          <span class="kpi-icon gold">🏆</span>
+        </div>
+        <div class="kpi-value highlight" id="kpiTopPlan">--</div>
+        <div class="kpi-footer" id="kpiTopPlanSub">Most engaged product page</div>
+      </div>
+
+      <div class="card kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">UX Health</span>
+          <span class="kpi-icon green">⚡</span>
+        </div>
+        <div class="kpi-value" id="kpiScroll">--</div>
+        <div class="kpi-footer" id="kpiFrustration">Rage clicks: 0 &bull; Dead clicks: 0</div>
+      </div>
+    </section>
+
+    <!-- Visual Charts Grid -->
+    <section class="charts-grid">
+      <div class="card chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Plan Engagement Comparison</h3>
+            <p class="card-sub">Traffic &amp; interest across Kotak Life wealth plans</p>
+          </div>
+          <span class="tag">Product Insights</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="planComparisonChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Device Breakdown</h3>
+            <p class="card-sub">Visitor platform distribution (Mobile vs Desktop)</p>
+          </div>
+          <span class="tag">Platform</span>
+        </div>
+        <div class="chart-container donut-wrap">
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Daily Trend & Popular Pages -->
+    <section class="details-grid">
+      <div class="card chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Session Activity Trend</h3>
+            <p class="card-sub">Daily traffic breakdown</p>
+          </div>
+          <span class="tag">Timeline</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <div class="card-head">
+          <div>
+            <h3>Popular Pages Breakdown</h3>
+            <p class="card-sub">Views, engagement and relative share</p>
+          </div>
+          <a href="https://emerson-insurance.pages.dev" target="_blank" class="live-link">View Live Site &nearr;</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th>Category</th>
+                <th class="num">Relative Share</th>
+              </tr>
+            </thead>
+            <tbody id="pagesTableBody">
+              <tr><td colspan="3" class="loading-td">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>Emerson Insurance Advisor Dashboard &bull; Microsoft Clarity Data Export API v1</p>
+      <p class="quota-note">&#9888; Note: Microsoft Clarity limits API calls to 10 requests per day. Data is cached locally.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
